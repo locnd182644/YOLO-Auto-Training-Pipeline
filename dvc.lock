@@ -14,8 +14,8 @@ stages:
       nfiles: 1
     - path: scripts/01_autolabel.py
       hash: md5
-      md5: 5a87f7829bce83dced178fda8168aa5c
-      size: 7443
+      md5: 9947396addb8229fb89d4b296d7a2e41
+      size: 7398
     outs:
     - path: data/labeled/labelme_json/auto_accepted
       hash: md5
@@ -103,7 +103,7 @@ stages:
     outs:
     - path: models/v1.2/best.pt
       hash: md5
-      md5: 9a6119c22c3b0f68e5a998beafa3ec24
+      md5: abb1094bd08c80f8c63f04361a4074b1
       size: 5455450
   evaluate:
     cmd: python scripts/05_evaluate.py --new models/v1.2/best.pt --metrics-out 
@@ -120,7 +120,7 @@ stages:
       nfiles: 23
     - path: models/v1.2/best.pt
       hash: md5
-      md5: 9a6119c22c3b0f68e5a998beafa3ec24
+      md5: abb1094bd08c80f8c63f04361a4074b1
       size: 5455450
     - path: scripts/05_evaluate.py
       hash: md5
@@ -132,5 +132,5 @@ stages:
     outs:
     - path: runs/evaluate/v1.2.json
       hash: md5
-      md5: 0908baccaa1360359de0c2f294b774ed
-      size: 480
+      md5: a1627906cb1306698190b20b607937b6
+      size: 461
