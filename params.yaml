@@ -1,5 +1,5 @@
 # Pipeline parameters. Bump `new` each retraining cycle; set `prev` to the
 # version currently in production (the one models/current points to).
 versions:
-  prev: v1.0
-  new: v1.1
+  prev: v1.1
+  new: v1.2
