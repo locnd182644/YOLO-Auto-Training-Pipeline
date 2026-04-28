@@ -125,7 +125,13 @@ def run(
         shutil.copy2(run_best, out_best)
 
         metrics = getattr(results, "results_dict", None) or {}
-        mlflow.log_metrics({k: float(v) for k, v in metrics.items()
+        # print("Training metrics:", metrics) (B)
+        # Clean: Replace '(' and ')' to '_' in metric keys to avoid MLflow issues.
+        clean_metrics = {
+            k.replace('(', '_').replace(')', ''): v 
+            for k, v in metrics.items()
+        }
+        mlflow.log_metrics({k: float(v) for k, v in clean_metrics.items()
                             if isinstance(v, (int, float))})
         mlflow.log_artifact(str(out_best))
 

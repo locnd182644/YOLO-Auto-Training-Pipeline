@@ -2,7 +2,7 @@
 # Hyperparameters live here, never hardcoded in scripts.
 
 training:
-  epochs: 50
+  epochs: 20
   imgsz: 640
   batch: 16
   optimizer: AdamW
@@ -12,7 +12,7 @@ training:
   workers: 8
   device: 0
   seed: 42
-  pretrained_fallback: yolov11n.pt  # cold-start weights if models/current is missing
+  pretrained_fallback: models/yolo11n.pt  # cold-start weights if models/current is missing
 
 evaluation:
   # Regression gate (Hard rule #4).

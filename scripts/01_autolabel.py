@@ -206,7 +206,7 @@ def main(argv: list[str] | None = None) -> int:
     cold_start = False
     if not model_path.exists():
         cfg = load_config(args.config)
-        fallback = Path(cfg.get("pretrained_fallback", "yolov11n.pt"))
+        fallback = Path(cfg.get("pretrained_fallback", "yolo11n.pt"))
         log.warning(
             "COLD START: %s not found. Falling back to pretrained %s "
             "(ultralytics will auto-download). Cold-start weights do not know "

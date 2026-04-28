@@ -16,7 +16,7 @@ max_det: 300
 # Cold-start fallback used by 01_autolabel.py when models/current/best.pt is
 # missing. ultralytics auto-downloads this from its releases. Cold-start
 # weights don't know project classes, so every image is routed to needs_review.
-pretrained_fallback: yolov11n.pt
+pretrained_fallback: models/yolo11n.pt
 
 # Paths (relative to repo root)
 paths:
@@ -29,4 +29,6 @@ paths:
 # Canonical class list. Must match data.yaml of the current dataset version.
 # Adding a class requires a MAJOR version bump AND relabeling (Hard rule #5).
 classes:
-  - object
+  - screw
+  - hole
+  - rivet
