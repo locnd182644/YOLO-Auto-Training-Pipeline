@@ -41,9 +41,9 @@ stages:
       nfiles: 0
     - path: data/labeled/labelme_json/reviewed
       hash: md5
-      md5: 07da93e2eb11f71cf0779edb435993a2.dir
-      size: 81932386
-      nfiles: 59
+      md5: 08906cfbf0d9439dc783604f7cbd03b5.dir
+      size: 49587812
+      nfiles: 20
     - path: scripts/02_convert_labelme_to_yolo.py
       hash: md5
       md5: 6e01e261a6c1411aed8f7b6d77595902
@@ -51,11 +51,11 @@ stages:
     outs:
     - path: data/labeled/yolo_txt
       hash: md5
-      md5: 5e36312c35d6e91488997bc615c4632d.dir
-      size: 120147374
-      nfiles: 58
+      md5: d7ee6ca3caf773b658e13b8a78a1c859.dir
+      size: 62003364
+      nfiles: 20
   merge:
-    cmd: python scripts/03_merge_and_version.py --prev v1.1 --new v1.2 --no-dvc 
+    cmd: python scripts/03_merge_and_version.py --prev v1.2 --new v1.3 --no-dvc 
       --no-tag
     deps:
     - path: configs/autolabel.yaml
@@ -64,73 +64,73 @@ stages:
       size: 1279
     - path: data/labeled/yolo_txt
       hash: md5
-      md5: 5e36312c35d6e91488997bc615c4632d.dir
-      size: 120147374
-      nfiles: 58
+      md5: d7ee6ca3caf773b658e13b8a78a1c859.dir
+      size: 62003364
+      nfiles: 20
     - path: scripts/03_merge_and_version.py
       hash: md5
       md5: 852f587e4055fd06233dcf163b14d7c3
       size: 9556
     params:
       params.yaml:
-        versions.new: v1.2
-        versions.prev: v1.1
+        versions.new: v1.3
+        versions.prev: v1.2
     outs:
-    - path: data/datasets/v1.2
+    - path: data/datasets/v1.3
       hash: md5
-      md5: 1b4688d00f155a6d7fe7586c91a031cb.dir
-      size: 245306635
-      nfiles: 119
+      md5: 904ed28ba42654a4320ccb7d669a305a.dir
+      size: 307309999
+      nfiles: 139
   train:
-    cmd: python scripts/04_train.py --data data/datasets/v1.2/data.yaml
+    cmd: python scripts/04_train.py --data data/datasets/v1.3/data.yaml
     deps:
     - path: configs/training.yaml
       hash: md5
-      md5: eb2ad2796f350baa56b6d18ea816ece0
-      size: 791
-    - path: data/datasets/v1.2
+      md5: 346748f3c411d6f27d3796aa0c2b9ac7
+      size: 792
+    - path: data/datasets/v1.3
       hash: md5
-      md5: 1b4688d00f155a6d7fe7586c91a031cb.dir
-      size: 245306635
-      nfiles: 119
+      md5: 904ed28ba42654a4320ccb7d669a305a.dir
+      size: 307309999
+      nfiles: 139
     - path: scripts/04_train.py
       hash: md5
       md5: d822b47219540dec9b3c44e5bee942a2
       size: 5114
     params:
       params.yaml:
-        versions.new: v1.2
+        versions.new: v1.3
     outs:
-    - path: models/v1.2/best.pt
+    - path: models/v1.3/best.pt
       hash: md5
-      md5: c67902ea913d0ef435b7c50b67784890
-      size: 5455450
+      md5: cc0f26accee7602b8ecb1f38b566da0e
+      size: 5459674
   evaluate:
-    cmd: python scripts/05_evaluate.py --new models/v1.2/best.pt --metrics-out 
-      runs/evaluate/v1.2.json
+    cmd: python scripts/05_evaluate.py --new models/v1.3/best.pt --metrics-out 
+      runs/evaluate/v1.3.json
     deps:
     - path: configs/training.yaml
       hash: md5
-      md5: eb2ad2796f350baa56b6d18ea816ece0
-      size: 791
+      md5: 346748f3c411d6f27d3796aa0c2b9ac7
+      size: 792
     - path: data/datasets/holdout_test
       hash: md5
       md5: 87f296c28c1cb67e7ea64627e8944884.dir
       size: 47043601
       nfiles: 23
-    - path: models/v1.2/best.pt
+    - path: models/v1.3/best.pt
       hash: md5
-      md5: c67902ea913d0ef435b7c50b67784890
-      size: 5455450
+      md5: cc0f26accee7602b8ecb1f38b566da0e
+      size: 5459674
     - path: scripts/05_evaluate.py
       hash: md5
       md5: 29db7b8e649cb598576324a137b10433
       size: 4531
     params:
       params.yaml:
-        versions.new: v1.2
+        versions.new: v1.3
     outs:
-    - path: runs/evaluate/v1.2.json
+    - path: runs/evaluate/v1.3.json
       hash: md5
-      md5: 33b31f3c46a5acece323ceafa276426b
-      size: 461
+      md5: f749a23d274c12de21163f4ca0c3ecc3
+      size: 476

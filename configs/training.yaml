@@ -2,7 +2,7 @@
 # Hyperparameters live here, never hardcoded in scripts.
 
 training:
-  epochs: 20
+  epochs: 100
   imgsz: 640
   batch: 16
   optimizer: AdamW
