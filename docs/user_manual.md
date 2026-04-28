@@ -397,6 +397,7 @@ That's it. Edit before each cycle.
 | `04_train` logs `COLD START` | Expected on first ever run. **Unexpected** on any later cycle — investigate before promoting (check `models/current` symlink) |
 | `05_evaluate` raises `Holdout data.yaml missing` | Step 3 of "One-time setup" wasn't completed |
 | `05_evaluate` exit 1, `decision: block` | Regression detected. Read `runbook.md` § "mAP dropped under threshold" |
+| `dvc status` shows `train: modified: data/datasets/v{X}` right after a successful `dvc repro` | Ultralytics writes `labels/*.cache` into the dataset during training. The `*.cache` rule in `.dvcignore` excludes those — if you still see this, confirm the rule is present and rerun `dvc repro` once to refresh `dvc.lock` |
 | `dvc pull` credentials error in CI | `runbook.md` § "CI fails at `dvc pull`" |
 
 For incidents not on this list, see `runbook.md` or escalate.

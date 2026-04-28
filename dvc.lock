@@ -90,9 +90,9 @@ stages:
       size: 791
     - path: data/datasets/v1.1
       hash: md5
-      md5: e6b47b70554f7b417f4c2889967fef14.dir
-      size: 125181695
-      nfiles: 63
+      md5: 79f997d19a868c99028c4091efc62def.dir
+      size: 125159261
+      nfiles: 61
     - path: scripts/04_train.py
       hash: md5
       md5: d822b47219540dec9b3c44e5bee942a2
@@ -103,7 +103,7 @@ stages:
     outs:
     - path: models/v1.1/best.pt
       hash: md5
-      md5: 3242e0115f79abb3d62548c09b2e6aa8
+      md5: 8e4e879ec6579c0fb38d056af4f3f58d
       size: 5455450
   evaluate:
     cmd: python scripts/05_evaluate.py --new models/v1.1/best.pt --metrics-out 
@@ -115,12 +115,12 @@ stages:
       size: 791
     - path: data/datasets/holdout_test
       hash: md5
-      md5: 394ab934b8f40e3d9cdfcd2d35beb035.dir
-      size: 47052881
-      nfiles: 24
+      md5: 87f296c28c1cb67e7ea64627e8944884.dir
+      size: 47043601
+      nfiles: 23
     - path: models/v1.1/best.pt
       hash: md5
-      md5: 3242e0115f79abb3d62548c09b2e6aa8
+      md5: 8e4e879ec6579c0fb38d056af4f3f58d
       size: 5455450
     - path: scripts/05_evaluate.py
       hash: md5
