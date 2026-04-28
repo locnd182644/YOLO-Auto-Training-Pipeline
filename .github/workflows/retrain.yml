@@ -1,0 +1,82 @@
+name: retrain
+
+on:
+  workflow_dispatch:
+    inputs:
+      prev_version:
+        description: "Previous dataset/model version (e.g. v1.1)"
+        required: true
+        type: string
+      new_version:
+        description: "New dataset/model version to produce (e.g. v1.2)"
+        required: true
+        type: string
+  push:
+    branches: [main]
+    paths:
+      - "data/raw/incoming.dvc"
+
+jobs:
+  retrain:
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 720
+    env:
+      MLFLOW_TRACKING_URI: file:./mlruns
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Pull data from DVC remote
+        run: dvc pull
+
+      - name: Update params for this run
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          python - <<'PY'
+          import yaml, sys, os
+          p = yaml.safe_load(open("params.yaml"))
+          p["versions"]["prev"] = os.environ["PREV"]
+          p["versions"]["new"]  = os.environ["NEW"]
+          yaml.safe_dump(p, open("params.yaml", "w"), sort_keys=False)
+          PY
+        env:
+          PREV: ${{ inputs.prev_version }}
+          NEW:  ${{ inputs.new_version }}
+
+      - name: Run pipeline (dvc repro)
+        id: repro
+        run: dvc repro
+
+      - name: Promote new model
+        if: success()
+        run: |
+          NEW=$(python -c "import yaml; print(yaml.safe_load(open('params.yaml'))['versions']['new'])")
+          echo "Promoting ${NEW} → models/current"
+          ln -sfn "${NEW}" models/current
+          git config user.name  "yolo-pipeline-bot"
+          git config user.email "bot@example.invalid"
+          git add params.yaml dvc.lock models/current
+          git commit -m "promote model ${NEW}"
+          git tag -a "model-${NEW}"   -m "promoted model ${NEW}"
+          git tag -a "dataset-${NEW}" -m "dataset ${NEW}"
+          dvc push
+          git push origin HEAD --follow-tags
+
+      - name: Upload evaluation metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-metrics
+          path: runs/evaluate/*.json
+          if-no-files-found: ignore

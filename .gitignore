@@ -205,3 +205,34 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ML artifacts (tracked by DVC, never in git)
+*.pt
+*.onnx
+*.engine
+*.torchscript
+runs/
+mlruns/
+mlartifacts/
+wandb/
+
+# Image + label payloads (DVC-tracked)
+data/raw/**/*.jpg
+data/raw/**/*.jpeg
+data/raw/**/*.png
+data/raw/**/*.bmp
+data/labeled/**/*.jpg
+data/labeled/**/*.jpeg
+data/labeled/**/*.png
+data/labeled/**/*.json
+data/labeled/**/*.txt
+data/datasets/**/images/**
+data/datasets/**/labels/**
+
+# DVC
+/.dvc/cache
+/.dvc/tmp
+/.dvc/config.local
+
+# Always keep directory scaffolding
+!.gitkeep

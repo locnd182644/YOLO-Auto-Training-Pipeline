@@ -1,0 +1,65 @@
+stages:
+  autolabel:
+    cmd: python scripts/01_autolabel.py
+    deps:
+      - scripts/01_autolabel.py
+      - configs/autolabel.yaml
+      - data/raw/incoming
+    outs:
+      - data/labeled/labelme_json/auto_accepted
+      - data/labeled/labelme_json/needs_review
+
+  convert:
+    cmd: python scripts/02_convert_labelme_to_yolo.py
+    deps:
+      - scripts/02_convert_labelme_to_yolo.py
+      - configs/autolabel.yaml
+      - data/labeled/labelme_json/auto_accepted
+      - data/labeled/labelme_json/reviewed
+    outs:
+      - data/labeled/yolo_txt
+
+  merge:
+    cmd: >-
+      python scripts/03_merge_and_version.py
+      --prev ${versions.prev}
+      --new ${versions.new}
+      --no-dvc --no-tag
+    params:
+      - versions.prev
+      - versions.new
+    deps:
+      - scripts/03_merge_and_version.py
+      - configs/autolabel.yaml
+      - data/labeled/yolo_txt
+    outs:
+      - data/datasets/${versions.new}
+
+  train:
+    cmd: >-
+      python scripts/04_train.py
+      --data data/datasets/${versions.new}/data.yaml
+    params:
+      - versions.new
+    deps:
+      - scripts/04_train.py
+      - configs/training.yaml
+      - data/datasets/${versions.new}
+    outs:
+      - models/${versions.new}/best.pt
+
+  evaluate:
+    cmd: >-
+      python scripts/05_evaluate.py
+      --new models/${versions.new}/best.pt
+      --metrics-out runs/evaluate/${versions.new}.json
+    params:
+      - versions.new
+    deps:
+      - scripts/05_evaluate.py
+      - configs/training.yaml
+      - models/${versions.new}/best.pt
+      - data/datasets/holdout_test
+    metrics:
+      - runs/evaluate/${versions.new}.json:
+          cache: false

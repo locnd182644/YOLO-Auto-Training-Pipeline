@@ -1,0 +1,6 @@
+outs:
+- md5: 1acdfd80e9d30aea44eeb6c985a840cb.dir
+  size: 47043601
+  nfiles: 23
+  hash: md5
+  path: holdout_test

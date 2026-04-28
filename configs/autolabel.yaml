@@ -1,0 +1,32 @@
+# Autolabel + confidence-routing configuration.
+# Every detection in an image is inspected. If ANY detection falls below
+# CONF_HIGH, the whole image is routed to needs_review/. This is the
+# label-drift guard mandated by CLAUDE.md (Hard rule #3).
+
+# Confidence thresholds
+CONF_HIGH: 0.6   # detections >= this are trusted; all-trusted images → auto_accepted
+CONF_LOW: 0.25   # detections < this are dropped entirely (treated as noise)
+
+# Inference
+imgsz: 640
+device: 0        # 0 for GPU:0, "cpu" for CPU
+iou: 0.5         # NMS IoU threshold
+max_det: 300
+
+# Cold-start fallback used by 01_autolabel.py when models/current/best.pt is
+# missing. ultralytics auto-downloads this from its releases. Cold-start
+# weights don't know project classes, so every image is routed to needs_review.
+pretrained_fallback: yolov11n.pt
+
+# Paths (relative to repo root)
+paths:
+  incoming: data/raw/incoming
+  archive: data/raw/archive
+  auto_accepted: data/labeled/labelme_json/auto_accepted
+  needs_review: data/labeled/labelme_json/needs_review
+  reviewed: data/labeled/labelme_json/reviewed
+
+# Canonical class list. Must match data.yaml of the current dataset version.
+# Adding a class requires a MAJOR version bump AND relabeling (Hard rule #5).
+classes:
+  - object

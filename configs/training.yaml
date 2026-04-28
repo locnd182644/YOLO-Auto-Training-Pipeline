@@ -1,0 +1,33 @@
+# Training + evaluation configuration.
+# Hyperparameters live here, never hardcoded in scripts.
+
+training:
+  epochs: 50
+  imgsz: 640
+  batch: 16
+  optimizer: AdamW
+  lr0: 0.001
+  lrf: 0.01
+  patience: 10        # early-stopping patience
+  workers: 8
+  device: 0
+  seed: 42
+  pretrained_fallback: yolov11n.pt  # cold-start weights if models/current is missing
+
+evaluation:
+  # Regression gate (Hard rule #4).
+  # If new_mAP50 < old_mAP50 - THRESHOLD, script exits 1 and CI refuses promotion.
+  threshold: 0.01
+  imgsz: 640
+  device: 0
+  holdout_data_yaml: data/datasets/holdout_test/data.yaml
+
+mlflow:
+  tracking_uri: file:./mlruns
+  experiment_name: yolo-auto-training
+
+paths:
+  models_dir: models
+  current_symlink: models/current
+  runs_dir: runs/train
+  datasets_dir: data/datasets
