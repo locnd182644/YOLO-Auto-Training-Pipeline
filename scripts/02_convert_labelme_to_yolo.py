@@ -19,11 +19,27 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from PIL import Image, ImageOps
 
 log = logging.getLogger("convert")
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp"}
+JPEG_SUFFIXES = {".jpg", ".jpeg"}
 ALLOWED_BUCKETS = ("auto_accepted", "reviewed")
+
+
+def copy_image(src: Path, dst: Path) -> None:
+    """Copy an image, normalizing JPEGs so ultralytics can't rewrite them
+    in place at train time (which would invalidate the merge stage's DVC
+    output hash on the next `dvc repro`)."""
+    if src.suffix.lower() in JPEG_SUFFIXES:
+        with Image.open(src) as im:
+            im = ImageOps.exif_transpose(im)
+            if im.mode != "RGB":
+                im = im.convert("RGB")
+            im.save(dst, "JPEG", subsampling=0, quality=100)
+    else:
+        shutil.copy2(src, dst)
 
 
 def load_config(path: Path) -> dict[str, Any]:
@@ -103,7 +119,7 @@ def convert_one(
         candidates.append(source_image_dir / f"{json_path.stem}{suf}")
     for c in candidates:
         if c.exists():
-            shutil.copy2(c, out_dir / c.name)
+            copy_image(c, out_dir / c.name)
             break
     else:
         raise FileNotFoundError(

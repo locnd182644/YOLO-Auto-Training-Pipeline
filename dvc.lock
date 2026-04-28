@@ -46,13 +46,13 @@ stages:
       nfiles: 59
     - path: scripts/02_convert_labelme_to_yolo.py
       hash: md5
-      md5: 5aeeb03a95c7e97d656d69f0b110fd8c
-      size: 5925
+      md5: 6e01e261a6c1411aed8f7b6d77595902
+      size: 6528
     outs:
     - path: data/labeled/yolo_txt
       hash: md5
-      md5: 379bc601187e27147008c73fa6f5e93b.dir
-      size: 56038654
+      md5: 5e36312c35d6e91488997bc615c4632d.dir
+      size: 120147374
       nfiles: 58
   merge:
     cmd: python scripts/03_merge_and_version.py --prev v1.1 --new v1.2 --no-dvc 
@@ -64,8 +64,8 @@ stages:
       size: 1279
     - path: data/labeled/yolo_txt
       hash: md5
-      md5: 379bc601187e27147008c73fa6f5e93b.dir
-      size: 56038654
+      md5: 5e36312c35d6e91488997bc615c4632d.dir
+      size: 120147374
       nfiles: 58
     - path: scripts/03_merge_and_version.py
       hash: md5
@@ -78,8 +78,8 @@ stages:
     outs:
     - path: data/datasets/v1.2
       hash: md5
-      md5: 4cb2193197249ffd7c0bf6727690796b.dir
-      size: 181197915
+      md5: 1b4688d00f155a6d7fe7586c91a031cb.dir
+      size: 245306635
       nfiles: 119
   train:
     cmd: python scripts/04_train.py --data data/datasets/v1.2/data.yaml
@@ -90,8 +90,8 @@ stages:
       size: 791
     - path: data/datasets/v1.2
       hash: md5
-      md5: fc2cd2bb8f84e2e9bb56f7bb28c8c104.dir
-      size: 237723253
+      md5: 1b4688d00f155a6d7fe7586c91a031cb.dir
+      size: 245306635
       nfiles: 119
     - path: scripts/04_train.py
       hash: md5
@@ -103,7 +103,7 @@ stages:
     outs:
     - path: models/v1.2/best.pt
       hash: md5
-      md5: abb1094bd08c80f8c63f04361a4074b1
+      md5: c67902ea913d0ef435b7c50b67784890
       size: 5455450
   evaluate:
     cmd: python scripts/05_evaluate.py --new models/v1.2/best.pt --metrics-out 
@@ -120,7 +120,7 @@ stages:
       nfiles: 23
     - path: models/v1.2/best.pt
       hash: md5
-      md5: abb1094bd08c80f8c63f04361a4074b1
+      md5: c67902ea913d0ef435b7c50b67784890
       size: 5455450
     - path: scripts/05_evaluate.py
       hash: md5
@@ -132,5 +132,5 @@ stages:
     outs:
     - path: runs/evaluate/v1.2.json
       hash: md5
-      md5: a1627906cb1306698190b20b607937b6
+      md5: 33b31f3c46a5acece323ceafa276426b
       size: 461
