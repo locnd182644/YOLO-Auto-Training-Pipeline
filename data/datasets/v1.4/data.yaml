@@ -1,8 +1,0 @@
-path: /root/Programming/Automation/YOLO-Auto-Training-Pipeline/data/datasets/v1.4
-train: images/train
-val: images/val
-nc: 3
-names:
-- screw
-- hole
-- rivet
