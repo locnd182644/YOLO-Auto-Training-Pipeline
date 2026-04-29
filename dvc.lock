@@ -14,8 +14,8 @@ stages:
       nfiles: 1
     - path: scripts/01_autolabel.py
       hash: md5
-      md5: 9947396addb8229fb89d4b296d7a2e41
-      size: 7398
+      md5: 3fb6a6cfe5201e0afbe305215d267f02
+      size: 8507
     outs:
     - path: data/labeled/labelme_json/auto_accepted
       hash: md5
@@ -41,21 +41,21 @@ stages:
       nfiles: 0
     - path: data/labeled/labelme_json/reviewed
       hash: md5
-      md5: 08906cfbf0d9439dc783604f7cbd03b5.dir
-      size: 49587812
-      nfiles: 20
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
     - path: scripts/02_convert_labelme_to_yolo.py
       hash: md5
-      md5: 6e01e261a6c1411aed8f7b6d77595902
-      size: 6528
+      md5: 6d19d49c6b7cb931dd2952a34ea7ad79
+      size: 6715
     outs:
     - path: data/labeled/yolo_txt
       hash: md5
-      md5: d7ee6ca3caf773b658e13b8a78a1c859.dir
-      size: 62003364
-      nfiles: 20
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
   merge:
-    cmd: python scripts/03_merge_and_version.py --prev v1.2 --new v1.3 --no-dvc 
+    cmd: python scripts/03_merge_and_version.py --prev v1.3 --new v1.4 --no-dvc 
       --no-tag
     deps:
     - path: configs/autolabel.yaml
@@ -64,33 +64,33 @@ stages:
       size: 1279
     - path: data/labeled/yolo_txt
       hash: md5
-      md5: d7ee6ca3caf773b658e13b8a78a1c859.dir
-      size: 62003364
-      nfiles: 20
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
     - path: scripts/03_merge_and_version.py
       hash: md5
       md5: 852f587e4055fd06233dcf163b14d7c3
       size: 9556
     params:
       params.yaml:
-        versions.new: v1.3
-        versions.prev: v1.2
+        versions.new: v1.4
+        versions.prev: v1.3
     outs:
-    - path: data/datasets/v1.3
+    - path: data/datasets/v1.4
       hash: md5
-      md5: 904ed28ba42654a4320ccb7d669a305a.dir
+      md5: e000954188433390583099c4749ccba5.dir
       size: 307309999
       nfiles: 139
   train:
-    cmd: python scripts/04_train.py --data data/datasets/v1.3/data.yaml
+    cmd: python scripts/04_train.py --data data/datasets/v1.4/data.yaml
     deps:
     - path: configs/training.yaml
       hash: md5
-      md5: 346748f3c411d6f27d3796aa0c2b9ac7
-      size: 792
-    - path: data/datasets/v1.3
+      md5: eb2ad2796f350baa56b6d18ea816ece0
+      size: 791
+    - path: data/datasets/v1.4
       hash: md5
-      md5: 904ed28ba42654a4320ccb7d669a305a.dir
+      md5: e000954188433390583099c4749ccba5.dir
       size: 307309999
       nfiles: 139
     - path: scripts/04_train.py
@@ -99,38 +99,38 @@ stages:
       size: 5114
     params:
       params.yaml:
-        versions.new: v1.3
+        versions.new: v1.4
     outs:
-    - path: models/v1.3/best.pt
+    - path: models/v1.4/best.pt
       hash: md5
-      md5: cc0f26accee7602b8ecb1f38b566da0e
-      size: 5459674
+      md5: 580792785bd25be9263a7cb7145b057a
+      size: 5454362
   evaluate:
-    cmd: python scripts/05_evaluate.py --new models/v1.3/best.pt --metrics-out 
-      runs/evaluate/v1.3.json
+    cmd: python scripts/05_evaluate.py --new models/v1.4/best.pt --metrics-out 
+      runs/evaluate/v1.4.json
     deps:
     - path: configs/training.yaml
       hash: md5
-      md5: 346748f3c411d6f27d3796aa0c2b9ac7
-      size: 792
+      md5: eb2ad2796f350baa56b6d18ea816ece0
+      size: 791
     - path: data/datasets/holdout_test
       hash: md5
       md5: 87f296c28c1cb67e7ea64627e8944884.dir
       size: 47043601
       nfiles: 23
-    - path: models/v1.3/best.pt
+    - path: models/v1.4/best.pt
       hash: md5
-      md5: cc0f26accee7602b8ecb1f38b566da0e
-      size: 5459674
+      md5: 580792785bd25be9263a7cb7145b057a
+      size: 5454362
     - path: scripts/05_evaluate.py
       hash: md5
       md5: 29db7b8e649cb598576324a137b10433
       size: 4531
     params:
       params.yaml:
-        versions.new: v1.3
+        versions.new: v1.4
     outs:
-    - path: runs/evaluate/v1.3.json
+    - path: runs/evaluate/v1.4.json
       hash: md5
-      md5: f749a23d274c12de21163f4ca0c3ecc3
-      size: 476
+      md5: b5df360ca1ea69a6860df480b8dfc6bc
+      size: 478

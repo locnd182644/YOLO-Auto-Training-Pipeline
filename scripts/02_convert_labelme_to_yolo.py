@@ -74,11 +74,15 @@ def labelme_shape_to_yolo(
     x_min, x_max = sorted((float(x1), float(x2)))
     y_min, y_max = sorted((float(y1), float(y2)))
     if x_min < 0 or y_min < 0 or x_max > img_w or y_max > img_h:
-        raise ValueError(
-            f"Bounding box out of image bounds for '{label}': "
-            f"points=({x_min:.1f},{y_min:.1f})→({x_max:.1f},{y_max:.1f}) "
-            f"image={img_w}x{img_h}"
+        log.warning(
+            "Clamping out-of-bounds box for '%s': "
+            "(%.1f,%.1f)→(%.1f,%.1f) image=%dx%d",
+            label, x_min, y_min, x_max, y_max, img_w, img_h,
         )
+        x_min = max(0.0, min(x_min, float(img_w)))
+        y_min = max(0.0, min(y_min, float(img_h)))
+        x_max = max(0.0, min(x_max, float(img_w)))
+        y_max = max(0.0, min(y_max, float(img_h)))
     if x_max <= x_min or y_max <= y_min:
         raise ValueError(
             f"Degenerate bounding box for '{label}': "

@@ -27,12 +27,40 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from PIL import Image
+from PIL import Image, ImageOps
 from ultralytics import YOLO
 
 log = logging.getLogger("autolabel")
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp"}
+JPEG_SUFFIXES = {".jpg", ".jpeg"}
+
+
+def normalize_image(src: Path, dst: Path) -> None:
+    """Write ``src`` to ``dst`` with EXIF orientation baked into the pixels.
+
+    Phone JPEGs commonly store a landscape bitmap plus an EXIF Orientation
+    tag instructing viewers to rotate at display time. labelme honors the
+    tag while editing but, when saving JSON with ``imageData: null``,
+    records the *raw* on-disk dimensions — which disagree with the points
+    it just wrote against the rotated view. Baking the rotation in at the
+    source eliminates the inconsistency for every downstream stage.
+    """
+    if src.suffix.lower() in JPEG_SUFFIXES:
+        with Image.open(src) as im:
+            im = ImageOps.exif_transpose(im)
+            if im.mode != "RGB":
+                im = im.convert("RGB")
+            im.save(dst, "JPEG", subsampling=0, quality=100)
+    else:
+        shutil.copy2(src, dst)
+
+
+def upright_size(image_path: Path) -> tuple[int, int]:
+    """Return (width, height) after EXIF orientation is applied."""
+    with Image.open(image_path) as im:
+        im = ImageOps.exif_transpose(im)
+        return im.size
 
 
 def load_config(path: Path) -> dict[str, Any]:
@@ -125,8 +153,7 @@ def autolabel_image(
             )
     bucket, kept = classify_image(detections, cfg["CONF_HIGH"], cfg["CONF_LOW"])
 
-    with Image.open(image_path) as im:
-        size = im.size  # (width, height)
+    size = upright_size(image_path)
     doc = build_labelme_doc(image_path, size, kept, class_names)
     return bucket, doc
 
@@ -157,8 +184,7 @@ def run(
     for img in images:
         try:
             if cold_start:
-                with Image.open(img) as im:
-                    size = im.size
+                size = upright_size(img)
                 doc = build_labelme_doc(img, size, [], class_names)
                 bucket = "needs_review"
             else:
@@ -171,10 +197,11 @@ def run(
         out_json = paths[bucket] / f"{img.stem}.json"
         with out_json.open("w") as f:
             json.dump(doc, f, indent=2)
-        # Also copy the image next to the JSON so the reviewer can open it.
-        shutil.copy2(img, paths[bucket] / img.name)
-        # Move original out of the incoming queue.
-        shutil.move(str(img), paths["archive"] / img.name)
+        # Write the upright (EXIF-baked) image next to the JSON and into
+        # the archive — labelme and every downstream stage see one frame.
+        normalize_image(img, paths[bucket] / img.name)
+        normalize_image(img, paths["archive"] / img.name)
+        img.unlink()
         counts[bucket] += 1
         log.debug("%s → %s", img.name, bucket)
 

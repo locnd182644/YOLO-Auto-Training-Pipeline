@@ -99,13 +99,28 @@ def test_reject_unknown_label(convert_mod):
         convert_mod.labelme_shape_to_yolo(shape, 100, 200, {"cat": 0, "dog": 1})
 
 
-def test_reject_out_of_bounds(convert_mod):
+def test_clamp_out_of_bounds(convert_mod, caplog):
     shape = {
         "label": "cat",
         "points": [[-5.0, 0.0], [50.0, 80.0]],
         "shape_type": "rectangle",
     }
-    with pytest.raises(ValueError, match="out of image bounds"):
+    with caplog.at_level("WARNING"):
+        line = convert_mod.labelme_shape_to_yolo(shape, 100, 200, {"cat": 0})
+    assert "Clamping" in caplog.text
+    cls_id, cx, cy, w, h = line.split()
+    assert cls_id == "0"
+    assert float(cx) == pytest.approx(25.0 / 100)
+    assert float(w) == pytest.approx(50.0 / 100)
+
+
+def test_reject_degenerate_after_clamp(convert_mod):
+    shape = {
+        "label": "cat",
+        "points": [[-10.0, -10.0], [-1.0, 50.0]],
+        "shape_type": "rectangle",
+    }
+    with pytest.raises(ValueError, match="Degenerate"):
         convert_mod.labelme_shape_to_yolo(shape, 100, 200, {"cat": 0})
 
 
